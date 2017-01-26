@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.53)
-AC_PACKAGE_VERSION(0.1.0)
-AC_INIT(ezlib, 0.1.0, [], [])
+AC_PACKAGE_VERSION(1.1.19)
+AC_INIT(fast_xml, 1.1.19, [], [])
 
 # Checks for programs.
 AC_PROG_CC
@@ -28,10 +28,22 @@ AC_ERLANG_NEED_ERLC
 # AC_ERLANG_SUBST_ROOT_DIR
 # AC_ERLANG_SUBST_LIB_DIR
 
-AC_CHECK_HEADER(zlib.h, [ZLIB_HEADER=yes], [], [])
+AC_CHECK_HEADERS([zlib.h], [], [
+    AC_MSG_ERROR([libz header file zlib.h was not found])])
 
-if test "x$ZLIB_HEADER" = "x"; then
-   AC_MSG_ERROR([zlib header file "zlib.h" was not found])
-fi
+AC_SEARCH_LIBS([inflate], [z], [], [
+    AC_MSG_ERROR([libz library was not found])])
 
+AC_ARG_ENABLE(gcov,
+[AC_HELP_STRING([--enable-gcov], [compile with gcov enabled (default: no)])],
+[case "${enableval}" in
+  yes) gcov=true ;;
+  no)  gcov=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gcov) ;;
+esac],[gcov=false])
+
+
+AC_SUBST(gcov)
+
+AC_CONFIG_FILES([vars.config])
 AC_OUTPUT
